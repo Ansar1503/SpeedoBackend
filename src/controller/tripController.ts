@@ -13,7 +13,7 @@ export class TripController implements ITripController {
       if (!req.file) {
         throw new AppError("CSV file is required", 400);
       }
-      
+      console.log(req.file);
       res.status(201).json({
         success: true,
       });
