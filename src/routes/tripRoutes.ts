@@ -1,9 +1,15 @@
-import express from "express";
-import { tripRoutes } from "../const/routeConstants";
+import { Router } from "express";
+import { container } from "../di/container";
+import { TYPES } from "../di/types";
+import { ITripController } from "../controller/interfaces/iTripController";
 import { uploadCSV } from "../middlewares/multerMiddleware";
 
-const routes = express.Router();
+const routes = Router();
 
-routes.post(`${tripRoutes.upload}`, uploadCSV.single("csv"));
+const tripController = container.get<ITripController>(TYPES.TripController);
 
-export default routes
+routes.post("/upload", uploadCSV.single("csv"), (req, res, next) =>
+  tripController.uploadTrip(req, res, next),
+);
+
+export default routes;

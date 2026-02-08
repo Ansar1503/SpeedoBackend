@@ -1,8 +1,9 @@
+import { injectable } from "inversify";
 import { Request, Response, NextFunction } from "express";
-
 import { AppError } from "../errors/appError";
 import { ITripController } from "./interfaces/iTripController";
 
+@injectable()
 export class TripController implements ITripController {
   async uploadTrip(
     req: Request,
@@ -13,14 +14,10 @@ export class TripController implements ITripController {
       if (!req.file) {
         throw new AppError("CSV file is required", 400);
       }
-      console.log(req.file);
-      res.status(201).json({
-        success: true,
-      });
-      return;
+
+      res.status(201).json({ success: true });
     } catch (error) {
       next(error);
-      return;
     }
   }
 
@@ -33,7 +30,6 @@ export class TripController implements ITripController {
       res.json({ success: true });
     } catch (error) {
       next(error);
-      return;
     }
   }
 }
