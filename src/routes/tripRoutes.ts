@@ -9,8 +9,10 @@ const routes = Router();
 
 const tripController = container.get<ITripController>(TYPES.TripController);
 
-routes.post(`${tripRoutes.upload}`, uploadCSV.single("file"), (req, res, next) =>
-  tripController.uploadTrip(req, res, next),
+routes.post(
+  `${tripRoutes.upload}`,
+  uploadCSV.single("file"),
+  tripController.uploadTrip,
 );
 
 export default routes;

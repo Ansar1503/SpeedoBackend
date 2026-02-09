@@ -20,29 +20,41 @@ export class AuthController implements IAuthController {
       if (!email?.trim()) throw new AppError("email not found. enter a email");
       if (!password?.trim())
         throw new AppError("password not found. please enter password");
-      await this.authService.signup({ name, email, password });
+      const result = await this.authService.signup({ name, email, password });
 
       res.status(STATUSCODES.created).json({
         success: true,
         message: "Signup successful",
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+        data: result.user,
       });
+      return;
     } catch (error) {
       next(error);
+      return;
     }
   }
 
   async signin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { email, password } = req.body;
-
-      await this.authService.signin({ email, password });
+      if (!email?.trim()) throw new AppError("email not found. enter a email");
+      if (!password?.trim())
+        throw new AppError("password not found. please enter password");
+      const result = await this.authService.signin({ email, password });
 
       res.status(STATUSCODES.success).json({
         success: true,
         message: "Signin successful",
+        data: result.user,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
       });
+      return;
     } catch (error) {
       next(error);
+      return;
     }
   }
 }
