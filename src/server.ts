@@ -7,7 +7,7 @@ import { errorHandler } from "./middlewares/errorHandlingMiddleware";
 import { api, authRoutes, tripRoutes } from "./const/routeConstants";
 import triprouters from "./routes/tripRoutes";
 import authRouter from "./routes/authRoutes";
-
+import morgan from "morgan";
 const PORT = process.env.PORT || 8000;
 const FrontendApi = process.env.FRONTEND_API || "http://localhost:3000";
 
@@ -20,10 +20,10 @@ app.use(
   }),
 );
 app.use(express.json());
-app.use(errorHandler);
-
+app.use(morgan("dev"));
 app.use(`${api}${tripRoutes.trips}`, triprouters);
 app.use(`${api}${authRoutes.auth}`, authRouter);
+app.use(errorHandler);
 
 const start = async () => {
   await connectDB();
