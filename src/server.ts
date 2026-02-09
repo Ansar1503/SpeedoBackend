@@ -21,9 +21,9 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());
+app.use(express.json());
 app.use(`${api}${tripRoutes.trips}`, triprouters);
 app.use(`${api}${authRoutes.auth}`, authRouter);
 app.use(errorHandler);

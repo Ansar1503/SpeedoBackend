@@ -25,8 +25,7 @@ export class AuthController implements IAuthController {
       res.cookie("refreshToken", result.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: `${api}${authRoutes.auth}${authRoutes.refresh}`,
+        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
@@ -70,7 +69,6 @@ export class AuthController implements IAuthController {
   ): Promise<void> {
     try {
       const refreshToken = req.cookies?.refreshToken;
-
       if (!refreshToken) {
         throw new AppError("Refresh token missing", STATUSCODES.forbidden);
       }
@@ -83,6 +81,7 @@ export class AuthController implements IAuthController {
       });
       return;
     } catch (error) {
+      console.log("error in refresh", error);
       next(error);
       return;
     }
@@ -98,6 +97,4 @@ export class AuthController implements IAuthController {
     });
     return;
   }
-
-  
 }
