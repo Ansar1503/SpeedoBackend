@@ -8,25 +8,28 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     this.model = model;
   }
 
-  create(data: Partial<T>): Promise<T> {
-    return this.model.create(data);
+  async create(data: Partial<T>): Promise<T> {
+    return await this.model.create(data);
   }
 
-  findById(id: string): Promise<T | null> {
-    return this.model.findById(new Types.ObjectId(id)).exec();
+  async findById(id: string): Promise<T | null> {
+    return await this.model.findById(new Types.ObjectId(id)).exec();
   }
 
-  find(filter?: Partial<T> | undefined): Promise<T[]> {
-    return this.model.find();
+  async find(filter?: Partial<T> | undefined): Promise<T[]> {
+    return await this.model.find();
   }
-  findOne(filter: Partial<T>): Promise<T | null> {
-    return this.model.findOne();
+  async findOne(filter: Partial<T>): Promise<T | null> {
+    return await this.model.findOne();
   }
-  updateById(id: string, update: mongoose.UpdateQuery<T>): Promise<T | null> {
-    return this.model.findByIdAndUpdate(id, update, { new: true }).exec();
+  async updateById(
+    id: string,
+    update: mongoose.UpdateQuery<T>,
+  ): Promise<T | null> {
+    return await this.model.findByIdAndUpdate(id, update, { new: true }).exec();
   }
 
-  deleteById(id: string): Promise<T | null> {
-    return this.model.findByIdAndDelete(id).exec();
+  async deleteById(id: string): Promise<T | null> {
+    return await this.model.findByIdAndDelete(id).exec();
   }
 }

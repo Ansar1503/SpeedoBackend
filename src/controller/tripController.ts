@@ -31,8 +31,11 @@ export class TripController implements ITripController {
         success: true,
         message: "trip data uploaded successfully",
       });
+      return
     } catch (error) {
+      console.log("error in upload trip",error);
       next(error);
+      return
     }
   }
 

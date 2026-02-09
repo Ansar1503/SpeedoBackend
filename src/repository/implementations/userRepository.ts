@@ -11,7 +11,7 @@ export class UserRepository
     super(UserModel);
   }
 
-  findByEmail(email: string): Promise<IUser | null> {
-    return this.findOne({ email });
+ async findByEmail(email: string): Promise<IUser | null> {
+    return await this.findOne({ email });
   }
 }

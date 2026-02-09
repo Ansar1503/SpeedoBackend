@@ -22,7 +22,7 @@ export class TripService implements ITripService {
 
   async uploadTrip(csvText: string, userId: string): Promise<void> {
     if (!csvText) {
-      throw new AppError("CSV content is empty",  STATUSCODES.badRequest);
+      throw new AppError("CSV content is empty", STATUSCODES.badRequest);
     }
     const existsUser = await this.userRepository.findById(userId);
     if (!existsUser) {
@@ -46,10 +46,20 @@ export class TripService implements ITripService {
     const cleanedRows = Array.from(uniqueRows.values());
 
     if (cleanedRows.length === 0) {
-      throw new AppError("No valid GPS data found in CSV", STATUSCODES.badRequest);
+      throw new AppError(
+        "No valid GPS data found in CSV",
+        STATUSCODES.badRequest,
+      );
     }
     const startTime = cleanedRows[0].timestamp;
     const endTime = cleanedRows[cleanedRows.length - 1].timestamp;
+
+    const trip = await this.tripRepository.create({
+      userId: existsUser._id,
+      name: `Trip ${new Date().toISOString()}`,
+      startTime,
+      endTime,
+    });
     const gpsDocs = cleanedRows.map((row) => ({
       tripId: trip._id,
       latitude: row.latitude,
@@ -58,13 +68,7 @@ export class TripService implements ITripService {
       ignition: row.ignition,
       speed: 0,
     }));
-
-    const trip = await this.tripRepository.create({
-      userId: existsUser._id,
-      name: `Trip ${new Date().toISOString()}`,
-      startTime,
-      endTime,
-    });
+    await this.gpsRepository.insertMany(gpsDocs);
   }
 
   async getTrips(): Promise<any[]> {

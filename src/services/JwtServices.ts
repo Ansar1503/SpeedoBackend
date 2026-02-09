@@ -12,7 +12,7 @@ export class TokenService implements ITokenService {
 
   generateAccessToken(payload: TokenPayload): string {
     return jwt.sign(payload, this.accessSecret, {
-      expiresIn: "15m",
+      expiresIn: "1h",
     });
   }
 

@@ -23,7 +23,6 @@ export const authenticate = (
     }
 
     const token = authHeader.split(" ")[1];
-
     const payload = jwt.verify(
       token,
       process.env.JWT_ACCESS_SECRET!,
@@ -39,6 +38,7 @@ export const authenticate = (
 
     next();
   } catch (error) {
+    console.log("error",error)
     next(
       new AppError("Invalid or expired access token", STATUSCODES.forbidden),
     );
