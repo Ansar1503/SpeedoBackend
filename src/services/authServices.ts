@@ -76,4 +76,18 @@ export class AuthServices implements IAuthService {
       },
     };
   }
+
+  async refresh(refreshToken: string): Promise<string> {
+    const payload = this._tokenService.verifyRefreshToken(refreshToken);
+
+    const user = await this._userRepository.findById(payload.userId);
+    if (!user) {
+      throw new AppError("Invalid refresh token", STATUSCODES.unauthorized);
+    }
+
+    return this._tokenService.generateAccessToken({
+      userId: user._id.toString(),
+      email: user.email,
+    });
+  }
 }

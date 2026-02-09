@@ -2,6 +2,8 @@ import { injectable } from "inversify";
 import jwt from "jsonwebtoken";
 import { ITokenService } from "./interfaces/iJwtServices";
 import { TokenPayload } from "../types/authTypes";
+import { STATUSCODES } from "../const/statusCodes";
+import { AppError } from "../errors/appError";
 
 @injectable()
 export class TokenService implements ITokenService {
@@ -18,5 +20,15 @@ export class TokenService implements ITokenService {
     return jwt.sign(payload, this.refreshSecret, {
       expiresIn: "7d",
     });
+  }
+  verifyRefreshToken(token: string) {
+    try {
+      return jwt.verify(token, this.refreshSecret) as {
+        userId: string;
+        email: string;
+      };
+    } catch {
+      throw new AppError("Invalid refresh token", STATUSCODES.unauthorized);
+    }
   }
 }

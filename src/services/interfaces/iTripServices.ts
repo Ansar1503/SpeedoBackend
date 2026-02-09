@@ -1,4 +1,4 @@
 export interface ITripService {
-  uploadTrip(csvText: string): Promise<void>;
+  uploadTrip(csvText: string, userId: string): Promise<void>;
   getTrips(): Promise<any[]>;
 }

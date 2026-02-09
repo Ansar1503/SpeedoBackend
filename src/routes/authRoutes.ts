@@ -15,7 +15,9 @@ router.post(authRoutes.signup, (req, res, next) =>
 router.post(authRoutes.signin, (req, res, next) =>
   authController.signin(req, res, next),
 );
-
+router.delete(authRoutes.logout, (req, res, next) =>
+  authController.logout(req, res, next),
+);
 // router.post("/refresh"   );
 
 export default router;

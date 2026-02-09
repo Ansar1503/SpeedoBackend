@@ -8,4 +8,5 @@ export interface IAuthService {
   }): Promise<AuthResult>;
 
   signin(data: { email: string; password: string }): Promise<AuthResult>;
+  refresh(refreshToken: string): Promise<string>;
 }
