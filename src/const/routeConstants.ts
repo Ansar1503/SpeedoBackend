@@ -4,7 +4,7 @@ export const tripRoutes = {
 };
 
 export const authRoutes = {
-  auth:"auth",
+  auth:"/auth",
   signup: "/signup",
   signin: "/signin",
 };

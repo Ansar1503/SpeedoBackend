@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../errors/appError";
+import { STATUSCODES } from "../const/statusCodes";
 
 export const errorHandler = (
   err: Error,
@@ -15,19 +16,19 @@ export const errorHandler = (
     return;
   }
   if (err.name === "MulterError") {
-    res.status(400).json({
+    res.status(STATUSCODES.badRequest).json({
       success: false,
       message: err.message,
     });
     return;
   }
   if (err.message) {
-    res.status(400).json({ success: false, message: err.message });
+    res.status(STATUSCODES.badRequest).json({ success: false, message: err.message });
     return;
   }
   console.error("❌ Unexpected Error:", err);
 
-  res.status(500).json({
+  res.status(STATUSCODES.internalServerError).json({
     success: false,
     message: "Internal server error",
   });

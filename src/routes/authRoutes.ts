@@ -8,8 +8,14 @@ const router = Router();
 
 const authController = container.get<IAuthController>(TYPES.AuthController);
 
-router.post(`${authRoutes.signup}`, authController.signup);
-router.post(`${authRoutes.signin}`, authController.signin);
+router.post(authRoutes.signup, (req, res, next) =>
+  authController.signup(req, res, next),
+);
+
+router.post(authRoutes.signin, (req, res, next) =>
+  authController.signin(req, res, next),
+);
+
 // router.post("/refresh"   );
 
 export default router;
