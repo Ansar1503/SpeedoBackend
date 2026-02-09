@@ -8,6 +8,7 @@ import { IGPSRepository } from "../repository/interface/iGpsRepository";
 import { TYPES } from "../di/types";
 import { IUserRepository } from "../repository/interface/iUserRepository";
 import { STATUSCODES } from "../const/statusCodes";
+import { calculateTripAnalytics } from "../utils/tripAnalytics";
 
 @injectable()
 export class TripService implements ITripService {
@@ -53,12 +54,19 @@ export class TripService implements ITripService {
     }
     const startTime = cleanedRows[0].timestamp;
     const endTime = cleanedRows[cleanedRows.length - 1].timestamp;
+    const analytics = calculateTripAnalytics(cleanedRows);
 
     const trip = await this.tripRepository.create({
       userId: existsUser._id,
       name: `Trip ${new Date().toISOString()}`,
       startTime,
       endTime,
+      totalDistance: analytics.totalDistance,
+      totalDuration: analytics.totalDuration,
+      totalIdlingDuration: analytics.totalIdlingDuration,
+      totalStoppageDuration: analytics.totalStoppageDuration,
+      overspeedDuration: analytics.overspeedDuration,
+      overspeedDistance: analytics.overspeedDistance,
     });
     const gpsDocs = cleanedRows.map((row) => ({
       tripId: trip._id,
