@@ -1,15 +1,18 @@
 // services/tripService.ts
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { ITripService } from "./interfaces/iTripServices";
 import { AppError } from "../errors/appError";
 import { ParsedGPSRow, parseRow } from "../utils/csv/gpsCsvParser";
 import { ITripRepository } from "../repository/interface/iTripInterface";
 import { IGPSRepository } from "../repository/interface/iGpsRepository";
+import { TYPES } from "../di/types";
 
 @injectable()
 export class TripService implements ITripService {
   constructor(
+    @inject(TYPES.TripRepository)
     private readonly tripRepository: ITripRepository,
+    @inject(TYPES.GPSRepository)
     private readonly gpsRepository: IGPSRepository,
   ) {}
 

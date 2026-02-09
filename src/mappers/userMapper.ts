@@ -6,7 +6,6 @@ export const UserMapper = (user: IUser): UserType => {
     id: user._id?.toString(),
     name: user.name,
     email: user.email,
-    password: user.password,
     createdAt: user.createdAt?.toISOString(),
     updatedAt: user.updatedAt?.toISOString(),
   };
