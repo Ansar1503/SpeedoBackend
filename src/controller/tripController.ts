@@ -14,10 +14,12 @@ export class TripController implements ITripController {
       if (!req.file) {
         throw new AppError("CSV file is required", 400);
       }
-
+      const csvText = req.file.buffer.toString("utf-8");
       res.status(201).json({ success: true });
+      return
     } catch (error) {
       next(error);
+      return
     }
   }
 
@@ -28,8 +30,10 @@ export class TripController implements ITripController {
   ): Promise<void> {
     try {
       res.json({ success: true });
+      return
     } catch (error) {
       next(error);
+      return
     }
   }
 }
