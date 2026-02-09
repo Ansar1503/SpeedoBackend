@@ -1,4 +1,4 @@
-import { TripType } from "../../types/tripType";
+import { FetchTripResponse, TripType } from "../../types/tripType";
 
 export interface ITripService {
   uploadTrip(csvText: string, userId: string): Promise<void>;
@@ -17,4 +17,5 @@ export interface ITripService {
     };
   }>;
   deleteTrips(userId: string, tripIds: string[]): Promise<void>;
+  fetchTripDataById(userId: string, tripId: string): Promise<FetchTripResponse>;
 }

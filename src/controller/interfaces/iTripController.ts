@@ -4,4 +4,5 @@ export interface ITripController {
   uploadTrip(req: Request, res: Response, next: NextFunction): Promise<void>;
   getTrips(req: Request, res: Response, next: NextFunction): Promise<void>;
   deleteTrips(req: Request, res: Response, next: NextFunction): Promise<void>;
+  fetchTripDataById(req: Request, res: Response, next: NextFunction): Promise<void>;
 }

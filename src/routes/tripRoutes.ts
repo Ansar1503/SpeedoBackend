@@ -22,6 +22,9 @@ routes.post(
 routes.get("/", authenticate, (req, res, next) => {
   tripController.getTrips(req, res, next);
 });
+routes.get("/:id", authenticate, (req, res, next) => {
+  tripController.fetchTripDataById(req, res, next);
+});
 routes.delete("/", authenticate, (req, res, next) => {
   tripController.deleteTrips(req, res, next);
 });

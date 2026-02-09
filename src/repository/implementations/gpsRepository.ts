@@ -18,4 +18,7 @@ export class GPSRepository
   async deleteByTripIds(tripIds: string[]): Promise<void> {
     await this.model.deleteMany({ tripId: { $in: tripIds } });
   }
+  async findByTripId(tripId: string): Promise<IGPSData[]> {
+    return await this.model.find({ tripId });
+  }
 }

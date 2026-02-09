@@ -91,4 +91,33 @@ export class TripController implements ITripController {
       return;
     }
   }
+
+  async fetchTripDataById(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      const { id } = req.params;
+
+      if (!id) {
+        throw new AppError("Trip ID is required", STATUSCODES.badRequest);
+      }
+
+      const result = await this._tripServices.fetchTripDataById(
+        userId!,
+        Array.isArray(id) ? id[0] : id,
+      );
+
+      res.status(STATUSCODES.success).json({
+        success: true,
+        data: result,
+      });
+      return;
+    } catch (error) {
+      next(error);
+      return;
+    }
+  }
 }

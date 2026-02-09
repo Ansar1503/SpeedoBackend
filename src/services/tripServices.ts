@@ -5,12 +5,14 @@ import { AppError } from "../errors/appError";
 import { ParsedGPSRow, parseRow } from "../utils/csv/gpsCsvParser";
 import { ITripRepository } from "../repository/interface/iTripInterface";
 import { IGPSRepository } from "../repository/interface/iGpsRepository";
+import { distanceInMeters, speedKmPerHour } from "../utils/geolibUtils";
 import { TYPES } from "../di/types";
 import { IUserRepository } from "../repository/interface/iUserRepository";
 import { STATUSCODES } from "../const/statusCodes";
 import { calculateTripAnalytics } from "../utils/tripAnalytics";
 import { reverseGeocode } from "../utils/reverseGeoCode";
 import { TripMapper } from "../mappers/tripMapper";
+import { FetchTripResponse } from "../types/tripType";
 
 @injectable()
 export class TripService implements ITripService {
@@ -125,5 +127,89 @@ export class TripService implements ITripService {
     }
     await this.tripRepository.deleteByIds(tripIds);
     await this.gpsRepository.deleteByTripIds(tripIds);
+  }
+  async fetchTripDataById(
+    userId: string,
+    tripId: string,
+  ): Promise<FetchTripResponse> {
+    const existingUser = await this.userRepository.findById(userId);
+    if (!existingUser) {
+      throw new AppError("User not found", STATUSCODES.notFound);
+    }
+
+    const existingTrip = await this.tripRepository.findById(tripId);
+    if (!existingTrip) {
+      throw new AppError("Trip not found", STATUSCODES.notFound);
+    }
+
+    if (existingTrip.userId.toString() !== userId) {
+      throw new AppError("Access denied", STATUSCODES.forbidden);
+    }
+
+    const gpsPoints = await this.gpsRepository.findByTripId(tripId);
+
+    if (gpsPoints.length === 0) {
+      throw new AppError("No GPS data found", STATUSCODES.notFound);
+    }
+    type GPSPointResponse = FetchTripResponse["gpsPoints"][number];
+
+    const enrichedGpsPoints: GPSPointResponse[] = [];
+
+    for (let i = 0; i < gpsPoints.length - 1; i++) {
+      const current = gpsPoints[i];
+      const next = gpsPoints[i + 1];
+
+      const timeDiffMs =
+        new Date(next.timestamp).getTime() -
+        new Date(current.timestamp).getTime();
+
+      const distanceMeters = distanceInMeters(current, next);
+      const speed = speedKmPerHour(distanceMeters, timeDiffMs);
+
+      let status: "stopped" | "idle" | "overspeed" | "normal" = "normal";
+
+      if (current.ignition === "off") {
+        status = "stopped";
+      } else if (speed === 0) {
+        status = "idle";
+      } else if (speed > 60) {
+        status = "overspeed";
+      }
+
+      enrichedGpsPoints.push({
+        latitude: current.latitude,
+        longitude: current.longitude,
+        timestamp: current.timestamp,
+        ignition: current.ignition,
+        speed: Math.round(speed),
+        status,
+      });
+    }
+
+    const last = gpsPoints[gpsPoints.length - 1];
+    enrichedGpsPoints.push({
+      latitude: last.latitude,
+      longitude: last.longitude,
+      timestamp: last.timestamp,
+      ignition: last.ignition,
+      speed: 0,
+      status: last.ignition === "off" ? "stopped" : "idle",
+    });
+
+    return {
+      trip: {
+        _id: existingTrip._id.toString(),
+        name: existingTrip.name,
+        startTime: existingTrip.startTime,
+        endTime: existingTrip.endTime,
+        totalDistance: existingTrip.totalDistance,
+        totalDuration: existingTrip.totalDuration,
+        totalIdlingDuration: existingTrip.totalIdlingDuration,
+        totalStoppageDuration: existingTrip.totalStoppageDuration,
+        overspeedDuration: existingTrip.overspeedDuration,
+        overspeedDistance: existingTrip.overspeedDistance,
+      },
+      gpsPoints: enrichedGpsPoints,
+    };
   }
 }
