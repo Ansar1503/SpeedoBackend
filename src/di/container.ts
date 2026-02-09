@@ -10,6 +10,12 @@ import { IGPSRepository } from "../repository/interface/iGpsRepository";
 import { GPSRepository } from "../repository/implementations/gpsRepository";
 import { ITokenService } from "../services/interfaces/iJwtServices";
 import { TokenService } from "../services/JwtServices";
+import { IAuthController } from "../controller/interfaces/iAuthController";
+import { AuthController } from "../controller/authController";
+import { AuthServices } from "../services/authServices";
+import { IAuthService } from "../services/interfaces/iAuthServices";
+import { IUserRepository } from "../repository/interface/iUserRepository";
+import { UserRepository } from "../repository/implementations/userRepository";
 
 const container = new Container();
 container.bind<ITripController>(TYPES.TripController).to(TripController);
@@ -17,5 +23,8 @@ container.bind<ITripService>(TYPES.TripService).to(TripService);
 container.bind<ITripRepository>(TYPES.TripRepository).to(TripRepository);
 container.bind<IGPSRepository>(TYPES.GPSRepository).to(GPSRepository);
 container.bind<ITokenService>(TYPES.TokenService).to(TokenService);
+container.bind<IAuthController>(TYPES.AuthController).to(AuthController);
+container.bind<IAuthService>(TYPES.AuthServices).to(AuthServices);
+container.bind<IUserRepository>(TYPES.UserRepository).to(UserRepository);
 
 export { container };
