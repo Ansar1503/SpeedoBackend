@@ -9,6 +9,7 @@ import { TYPES } from "../di/types";
 import { IUserRepository } from "../repository/interface/iUserRepository";
 import { STATUSCODES } from "../const/statusCodes";
 import { calculateTripAnalytics } from "../utils/tripAnalytics";
+import { reverseGeocode } from "../utils/reverseGeoCode";
 
 @injectable()
 export class TripService implements ITripService {
@@ -52,13 +53,23 @@ export class TripService implements ITripService {
         STATUSCODES.badRequest,
       );
     }
+    const startPoint = cleanedRows[0];
+    const endPoint = cleanedRows[cleanedRows.length - 1];
     const startTime = cleanedRows[0].timestamp;
     const endTime = cleanedRows[cleanedRows.length - 1].timestamp;
     const analytics = calculateTripAnalytics(cleanedRows);
 
+    const fromPlace = await reverseGeocode(
+      startPoint.latitude,
+      startPoint.longitude,
+    );
+
+    const toPlace = await reverseGeocode(endPoint.latitude, endPoint.longitude);
+
+    const tripName = `${fromPlace} → ${toPlace}`;
     const trip = await this.tripRepository.create({
       userId: existsUser._id,
-      name: `Trip ${new Date().toISOString()}`,
+      name: tripName,
       startTime,
       endTime,
       totalDistance: analytics.totalDistance,
@@ -68,13 +79,13 @@ export class TripService implements ITripService {
       overspeedDuration: analytics.overspeedDuration,
       overspeedDistance: analytics.overspeedDistance,
     });
-    const gpsDocs = cleanedRows.map((row) => ({
+    const gpsDocs = cleanedRows.map((row, index) => ({
       tripId: trip._id,
       latitude: row.latitude,
       longitude: row.longitude,
       timestamp: row.timestamp,
       ignition: row.ignition,
-      speed: 0,
+      speed: analytics.speeds[index] || 0,
     }));
     await this.gpsRepository.insertMany(gpsDocs);
   }
