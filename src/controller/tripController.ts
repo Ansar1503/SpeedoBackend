@@ -66,4 +66,29 @@ export class TripController implements ITripController {
       return;
     }
   }
+  async deleteTrips(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      const { tripIds } = req.body;
+
+      if (!Array.isArray(tripIds) || tripIds.length === 0) {
+        throw new AppError("Trip IDs are required", STATUSCODES.badRequest);
+      }
+
+      await this._tripServices.deleteTrips(userId!, tripIds);
+
+      res.status(STATUSCODES.success).json({
+        success: true,
+        message: "Trips deleted successfully",
+      });
+      return;
+    } catch (error) {
+      next(error);
+      return;
+    }
+  }
 }

@@ -22,5 +22,8 @@ routes.post(
 routes.get("/", authenticate, (req, res, next) => {
   tripController.getTrips(req, res, next);
 });
+routes.delete("/", authenticate, (req, res, next) => {
+  tripController.deleteTrips(req, res, next);
+});
 
 export default routes;

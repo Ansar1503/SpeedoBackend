@@ -16,4 +16,5 @@ export interface ITripService {
       totalPages: number;
     };
   }>;
+  deleteTrips(userId: string, tripIds: string[]): Promise<void>;
 }

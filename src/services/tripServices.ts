@@ -10,7 +10,6 @@ import { IUserRepository } from "../repository/interface/iUserRepository";
 import { STATUSCODES } from "../const/statusCodes";
 import { calculateTripAnalytics } from "../utils/tripAnalytics";
 import { reverseGeocode } from "../utils/reverseGeoCode";
-import { TripType } from "../types/tripType";
 import { TripMapper } from "../mappers/tripMapper";
 
 @injectable()
@@ -114,5 +113,17 @@ export class TripService implements ITripService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+  async deleteTrips(userId: string, tripIds: string[]): Promise<void> {
+    const existingUser = await this.userRepository.findById(userId);
+    if (!existingUser) {
+      throw new AppError("User not found", STATUSCODES.notFound);
+    }
+    const existingTrips = await this.tripRepository.findByIds(tripIds);
+    if (!existingTrips) {
+      throw new AppError("Trips not found", STATUSCODES.notFound);
+    }
+    await this.tripRepository.deleteByIds(tripIds);
+    await this.gpsRepository.deleteByTripIds(tripIds);
   }
 }

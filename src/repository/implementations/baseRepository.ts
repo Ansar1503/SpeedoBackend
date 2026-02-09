@@ -16,20 +16,15 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     return await this.model.findById(new Types.ObjectId(id)).exec();
   }
 
-  async find(filter?: Partial<T> | undefined): Promise<T[]> {
-    return await this.model.find();
-  }
-  async findOne(filter: Partial<T>): Promise<T | null> {
-    return await this.model.findOne();
-  }
-  async updateById(
-    id: string,
-    update: mongoose.UpdateQuery<T>,
-  ): Promise<T | null> {
-    return await this.model.findByIdAndUpdate(id, update, { new: true }).exec();
-  }
-
   async deleteById(id: string): Promise<T | null> {
     return await this.model.findByIdAndDelete(id).exec();
+  }
+  async findByIds(ids: string[]): Promise<T[]> {
+    const objectIdIds = ids.map((id) => new Types.ObjectId(id));
+    return await this.model.find({ _id: { $in: objectIdIds } }).exec();
+  }
+  async deleteByIds(ids: string[]): Promise<void> {
+    const objectIdIds = ids.map((id) => new Types.ObjectId(id));
+    await this.model.deleteMany({ _id: { $in: objectIdIds } }).exec();
   }
 }
