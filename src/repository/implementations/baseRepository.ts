@@ -1,4 +1,4 @@
-import mongoose, { Model, Document } from "mongoose";
+import mongoose, { Model, Types } from "mongoose";
 import { IBaseRepository } from "../interface/iBaseRepository";
 
 export class BaseRepository<T> implements IBaseRepository<T> {
@@ -13,7 +13,7 @@ export class BaseRepository<T> implements IBaseRepository<T> {
   }
 
   findById(id: string): Promise<T | null> {
-    return this.model.findById(id).exec();
+    return this.model.findById(new Types.ObjectId(id)).exec();
   }
 
   find(filter?: Partial<T> | undefined): Promise<T[]> {
