@@ -31,23 +31,39 @@ export class TripController implements ITripController {
         success: true,
         message: "trip data uploaded successfully",
       });
-      return
+      return;
     } catch (error) {
-      console.log("error in upload trip",error);
+      console.log("error in upload trip", error);
       next(error);
-      return
+      return;
     }
   }
 
   async getTrips(
-    req: Request,
+    req: AuthRequest,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
-      res.status(STATUSCODES.success).json({ success: true });
+      const userId = req.user?.userId;
+      let { page, limit, search } = req.query;
+
+      const result = await this._tripServices.getTrips(
+        userId!,
+        isNaN(Number(page)) ? 1 : Number(page),
+        isNaN(Number(limit)) ? 10 : Number(limit),
+        typeof search === "string" ? search : "",
+      );
+      res.status(STATUSCODES.success).json({
+        success: true,
+        data: result.data,
+        pagination: result.pagination,
+      });
+
+      return;
     } catch (error) {
       next(error);
+      return;
     }
   }
 }

@@ -10,6 +10,8 @@ import { IUserRepository } from "../repository/interface/iUserRepository";
 import { STATUSCODES } from "../const/statusCodes";
 import { calculateTripAnalytics } from "../utils/tripAnalytics";
 import { reverseGeocode } from "../utils/reverseGeoCode";
+import { TripType } from "../types/tripType";
+import { TripMapper } from "../mappers/tripMapper";
 
 @injectable()
 export class TripService implements ITripService {
@@ -90,7 +92,27 @@ export class TripService implements ITripService {
     await this.gpsRepository.insertMany(gpsDocs);
   }
 
-  async getTrips(): Promise<any[]> {
-    return [];
+  async getTrips(userId: string, page: number, limit: number, search: string) {
+    const existingUser = await this.userRepository.findById(userId);
+    if (!existingUser) {
+      throw new AppError("User not found", STATUSCODES.notFound);
+    }
+
+    const { trips, total } = await this.tripRepository.findAllTrips(
+      userId,
+      page,
+      limit,
+      search,
+    );
+    const mappedTrips = trips.map(TripMapper);
+    return {
+      data: mappedTrips,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }

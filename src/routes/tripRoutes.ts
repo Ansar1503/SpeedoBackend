@@ -19,4 +19,8 @@ routes.post(
   },
 );
 
+routes.get("/", authenticate, (req, res, next) => {
+  tripController.getTrips(req, res, next);
+});
+
 export default routes;

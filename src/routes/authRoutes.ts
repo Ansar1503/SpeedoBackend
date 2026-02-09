@@ -18,6 +18,8 @@ router.post(authRoutes.signin, (req, res, next) =>
 router.delete(authRoutes.logout, (req, res, next) =>
   authController.logout(req, res, next),
 );
-// router.post("/refresh"   );
+router.post(authRoutes.refresh, (req, res, next) =>
+  authController.refresh(req, res, next),
+);
 
 export default router;
