@@ -24,8 +24,8 @@ export class AuthController implements IAuthController {
       const result = await this.authService.signup({ name, email, password });
       res.cookie("refreshToken", result.refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: true,
+        sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
@@ -49,6 +49,12 @@ export class AuthController implements IAuthController {
       if (!password?.trim())
         throw new AppError("password not found. please enter password");
       const result = await this.authService.signin({ email, password });
+      res.cookie("refreshToken", result.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
 
       res.status(STATUSCODES.success).json({
         success: true,
